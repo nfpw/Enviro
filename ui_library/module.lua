@@ -13,6 +13,7 @@
 ]]
 
 local cloneref = cloneref or function(v) return v; end
+local request = syn and syn.request or http_request or request
 
 if Library then
 	Library:Unload()
@@ -28,6 +29,7 @@ local Library do
 	local RunService = cloneref(game.GetService(game, "RunService")) or cloneref(game:GetService("RunService"))
 	local CoreGui = cloneref and cloneref(game.GetService(game, "TweenService") or cloneref(game:GetService("CoreGui")) or Players.LocalPlayer:WaitForChild("PlayerGui"))
 	local TweenService = cloneref(game.GetService(game, "TweenService")) or cloneref(game:GetService("TweenService"))
+	local SoundService = cloneref(game.GetService(game, "SoundService")) or cloneref(game:GetService("SoundService"))
 
 	gethui = gethui or function()
 		return CoreGui
@@ -105,6 +107,13 @@ local Library do
 			["ScrollBar"] = {"Scroll_Bar.png", "https://github.com/nfpw/Enviro/blob/main/ui_library/assets/Scroll_Bar.png?raw=true"},
 			["Scoot"] = {"Scoot.png", "https://github.com/nfpw/Enviro/blob/main/ui_library/assets/Scoot.png?raw=true"},
 			["X"] = {"X.png", "https://github.com/nfpw/Enviro/blob/main/ui_library/assets/X.png?raw=true"},
+		},
+
+		Sounds = {
+    		["Click"]  = {"Click.ogg",  "https://github.com/nfpw/Enviro/blob/main/ui_library/assets/Click.ogg?raw=true"},
+    		["Scroll"] = {"Scroll.ogg", "https://github.com/nfpw/Enviro/blob/main/ui_library/assets/Scroll.ogg?raw=true"},
+    		["Open"]   = {"Open.ogg",   "https://github.com/nfpw/Enviro/blob/main/ui_library/assets/Open.ogg?raw=true"},
+    		["Close"]  = {"Close.ogg",  "https://github.com/nfpw/Enviro/blob/main/ui_library/assets/Close.ogg?raw=true"},
 		},
 
 		-- Ignore below
@@ -262,16 +271,13 @@ local Library do
 		end
 	end
 
-	-- Images
+	-- Images 
 	for Index, Value in Library.Images do 
-		local ImageData = Value
-
-		local ImageName = ImageData[1]
-		local ImageLink = ImageData[2]
-
-		if not isfile(Library.Folders.Assets .. "/" .. ImageName) then
-			writefile(Library.Folders.Assets .. "/" .. ImageName, request({Url = ImageLink, Method = "GET"}).Body)
-		end
+    	local ImageName = Value[1]
+    	local ImageLink = Value[2]
+    	if not isfile(Library.Folders.Assets .. "/" .. ImageName) then
+        	writefile(Library.Folders.Assets .. "/" .. ImageName, request({Url = ImageLink, Method = "GET"}).Body)
+    	end
 	end
 
 	-- Tweening
@@ -1395,6 +1401,7 @@ local Library do
 				else
 					Debounce = false
 				end
+				--if Bool then Library:PlaySound("Click", 0.2, 1.0) end
 			end
 
 			Items["Inactive"]:Connect("MouseButton1Down", function()
@@ -1634,6 +1641,7 @@ local Library do
 				else
 					Debounce = false
 				end
+				--if Bool then Library:PlaySound("Click", 0.2, 1.0) end
 			end
 
 			Items["Inactive"]:Connect("MouseButton1Down", function()
@@ -1818,6 +1826,7 @@ local Library do
 				if Data.Callback then 
 					Library:SafeCall(Data.Callback, Toggle.Value)
 				end
+				--Library:PlaySound("Click", 0.35, Value and 1.1 or 0.9)
 			end
 
 			function Toggle:SetVisibility(Bool)
@@ -1949,7 +1958,7 @@ local Library do
 
 					Library:SafeCall(Callback)
 					task.wait(0.1)
-
+					--Library:PlaySound("Click", 0.4, 1.05)
 					SubItems["NewButton"]:ChangeItemTheme({BackgroundColor3 = "Element", BorderColor3 = "Border"})
 					SubItems["NewButton"]:Tween(nil, {BackgroundColor3 = Library.Theme.Element})
 				end
@@ -2175,17 +2184,24 @@ local Library do
 				end
 			end)
 
+			--[[
+			local LastSliderSound = 0
+
 			Library:Connect(UserInputService.InputChanged, function(Input)
-				if Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch then
-					if Slider.Sliding then
-						local SizeX = (Mouse.X - Items["RealSlider"].Instance.AbsolutePosition.X) / Items["RealSlider"].Instance.AbsoluteSize.X
-						local Value = ((Data.Max - Data.Min) * SizeX) + Data.Min
-
-						Slider:Set(Value)
-					end
-				end
+    			if Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch then
+        			if Slider.Sliding then
+            			local SizeX = (Mouse.X - Items["RealSlider"].Instance.AbsolutePosition.X) / Items["RealSlider"].Instance.AbsoluteSize.X
+            			local Value = ((Data.Max - Data.Min) * SizeX) + Data.Min
+            			Slider:Set(Value)
+            			local Now = tick()
+            			if Now - LastSliderSound >= 0.08 then
+                		LastSliderSound = Now
+                		Library:PlaySound("Click", 0.12, 0.9 + (SizeX * 0.4))
+            			end
+        			end
+    			end
 			end)
-
+			]]
 			Items["Slider"]:OnHover(function()
 				Items["RealSlider"]:ChangeItemTheme({BackgroundColor3 = "Hovered Element", BorderColor3 = "Border"})
 				Items["RealSlider"]:Tween(nil, {BackgroundColor3 = Library.Theme["Hovered Element"]})
@@ -2389,6 +2405,15 @@ local Library do
 					BackgroundColor3 = FromRGB(20, 24, 21)
 				})  Items["OptionHolder"]:AddToTheme({BackgroundColor3 = "Inline", BorderColor3 = "Border"})
 
+				--[[
+				Library:Connect(Items["OptionHolder"].Instance.MouseWheelForward, function()
+    				Library:PlaySound("Click", 0.15, 1.2)
+				end)
+
+				Library:Connect(Items["OptionHolder"].Instance.MouseWheelBackward, function()
+    				Library:PlaySound("Click", 0.15, 0.85)
+				end)
+				]]
 				Instances:Create("UIStroke", {
 					Parent = Items["OptionHolder"].Instance,
 					Name = "\0",
@@ -2498,6 +2523,7 @@ local Library do
 					task.wait(0.2)
 					Items["OptionHolder"].Instance.Parent = not Dropdown.IsOpen and Library.UnusedHolder.Instance or Library.Holder.Instance
 				end
+				--Library:PlaySound("Click", 0.3, Bool and 1.1 or 0.85)
 			end
 
 			function Dropdown:SetVisibility(Bool)
@@ -2635,6 +2661,7 @@ local Library do
 					if Data.Callback then
 						Library:SafeCall(Data.Callback, Dropdown.Value)
 					end
+					--Library:PlaySound("Click", 0.25, 1.15)
 				end
 
 				OptionData.Button:Connect("MouseButton1Down", function()
@@ -3665,6 +3692,7 @@ local Library do
 					task.wait(0.2)
 					Items["ColorpickerWindow"].Instance.Parent = not Colorpicker.IsOpen and Library.UnusedHolder.Instance or Library.Holder.Instance
 				end
+				--Library:PlaySound("Click", 0.25, Bool and 1.1 or 0.85)
 			end
 
 			UpdateSync = function(Bool)
@@ -4208,6 +4236,7 @@ local Library do
 					task.wait(0.2)
 					Items["KeybindWindow"].Instance.Parent = not Keybind.IsOpen and Library.UnusedHolder.Instance or Library.Holder.Instance
 				end
+				--Library:PlaySound("Click", 0.3, Bool and 1.1 or 0.85)
 			end
 
 			function Keybind:SetMode(Mode)
@@ -4363,6 +4392,7 @@ local Library do
 					KeylistItem:SetStatus(false)
 				end
 
+				--Library:PlaySound("Click", 0.3, 0.8)
 				Keybind:SetOpen(false)
 			end)
 
@@ -4647,6 +4677,16 @@ local Library do
 					BackgroundColor3 = FromRGB(255, 255, 255)
 				})  Items["List"]:AddToTheme({ScrollBarImageColor3 = "Accent"})
 
+				--[[
+				Library:Connect(Items["List"].Instance.MouseWheelForward, function()
+    				Library:PlaySound("Click", 0.15, 1.2)
+				end)
+
+				Library:Connect(Items["List"].Instance.MouseWheelBackward, function()
+    				Library:PlaySound("Click", 0.15, 0.85)
+				end)
+				]]
+
 				Instances:Create("UIListLayout", {
 					Parent = Items["List"].Instance,
 					Name = "\0",
@@ -4752,6 +4792,7 @@ local Library do
 				end
 
 				function OptionData:Set()
+					--Library:PlaySound("Click", 0.35, 1.1)
 					OptionData.Selected = not OptionData.Selected
 
 					if Data.Multi then 
