@@ -2186,8 +2186,7 @@ local Library do
 				end
 			end)
 
-			--[[
-			local LastSliderSound = 0
+			--local LastSliderSound = 0
 
 			Library:Connect(UserInputService.InputChanged, function(Input)
     			if Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch then
@@ -2195,15 +2194,18 @@ local Library do
             			local SizeX = (Mouse.X - Items["RealSlider"].Instance.AbsolutePosition.X) / Items["RealSlider"].Instance.AbsoluteSize.X
             			local Value = ((Data.Max - Data.Min) * SizeX) + Data.Min
             			Slider:Set(Value)
+           				--[[ 
+						Sound effects commented out since Library:PlaySound might not exist
             			local Now = tick()
             			if Now - LastSliderSound >= 0.08 then
-                		LastSliderSound = Now
-                		Library:PlaySound("Click", 0.12, 0.9 + (SizeX * 0.4))
-            			end
+                 			LastSliderSound = Now
+                 			Library:PlaySound("Click", 0.12, 0.9 + (SizeX * 0.4))
+             			end 
+					 	--]]
         			end
     			end
 			end)
-			]]
+
 			Items["Slider"]:OnHover(function()
 				Items["RealSlider"]:ChangeItemTheme({BackgroundColor3 = "Hovered Element", BorderColor3 = "Border"})
 				Items["RealSlider"]:Tween(nil, {BackgroundColor3 = Library.Theme["Hovered Element"]})
