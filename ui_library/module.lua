@@ -495,24 +495,26 @@ local Library do
 			local InputChanged
 
 			self:Connect("InputBegan", function(Input)
-				if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-					Dragging = true
+				if UserInputService:GetFocusedTextBox() == nil then
+					if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+						Dragging = true
 
-					DragStart = Input.Position
-					StartPosition = Gui.Position
+						DragStart = Input.Position
+						StartPosition = Gui.Position
 
-					if InputChanged then 
-						return
-					end
-
-					InputChanged = Input.Changed:Connect(function()
-						if Input.UserInputState == Enum.UserInputState.End then
-							Dragging = false
-
-							InputChanged:Disconnect()
-							InputChanged = nil
+						if InputChanged then 
+							return
 						end
-					end)
+
+						InputChanged = Input.Changed:Connect(function()
+							if Input.UserInputState == Enum.UserInputState.End then
+								Dragging = false
+
+								InputChanged:Disconnect()
+								InputChanged = nil
+							end
+						end)
+					end
 				end
 			end)
 
@@ -4313,10 +4315,12 @@ local Library do
 
 				local InputBegan
 				InputBegan = UserInputService.InputBegan:Connect(function(Input)
-					if Input.UserInputType == Enum.UserInputType.Keyboard then 
-						Keybind:Set(Input.KeyCode)
-					else
-						Keybind:Set(Input.UserInputType)
+					if UserInputService:GetFocusedTextBox() == nil then
+						if Input.UserInputType == Enum.UserInputType.Keyboard then 
+							Keybind:Set(Input.KeyCode)
+						else
+							Keybind:Set(Input.UserInputType)
+						end
 					end
 					InputBegan:Disconnect()
 					InputBegan = nil
@@ -4328,28 +4332,30 @@ local Library do
 			end)
 
 			Library:Connect(UserInputService.InputBegan, function(Input)
-				if Keybind.Value == "None" or Keybind.Value == "" then
-					return
-				end
-
-				if tostring(Input.KeyCode) == Keybind.Key then
-					if Keybind.Mode == "Toggle" then 
-						Keybind:Press()
-					elseif Keybind.Mode == "Hold" then 
-						Keybind:Press(true)
+				if UserInputService:GetFocusedTextBox() == nil then
+					if Keybind.Value == "None" or Keybind.Value == "" then
+						return
 					end
-				elseif tostring(Input.UserInputType) == Keybind.Key then
-					if Keybind.Mode == "Toggle" then 
-						Keybind:Press()
-					elseif Keybind.Mode == "Hold" then 
-						Keybind:Press(true)
-					end
-				end
 
-				if Input.UserInputType == Enum.UserInputType.MouseButton1 then
-					if not Keybind.IsOpen then return end
-					if Library:IsMouseOverFrame(Items["KeybindWindow"]) then return end
-					Keybind:SetOpen(false)
+					if tostring(Input.KeyCode) == Keybind.Key then
+						if Keybind.Mode == "Toggle" then 
+							Keybind:Press()
+						elseif Keybind.Mode == "Hold" then 
+							Keybind:Press(true)
+						end
+					elseif tostring(Input.UserInputType) == Keybind.Key then
+						if Keybind.Mode == "Toggle" then 
+							Keybind:Press()
+						elseif Keybind.Mode == "Hold" then 
+							Keybind:Press(true)
+						end
+					end
+
+					if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+						if not Keybind.IsOpen then return end
+						if Library:IsMouseOverFrame(Items["KeybindWindow"]) then return end
+						Keybind:SetOpen(false)
+					end
 				end
 			end)
 
@@ -5510,8 +5516,10 @@ local Library do
 		end
 
 		Library:Connect(UserInputService.InputBegan, function(Input)
-			if tostring(Input.KeyCode) == Library.MenuKeybind or tostring(Input.UserInputType) == Library.MenuKeybind then
-				Window:SetOpen(not Window.IsOpen)
+			if UserInputService:GetFocusedTextBox() == nil then
+				if tostring(Input.KeyCode) == Library.MenuKeybind or tostring(Input.UserInputType) == Library.MenuKeybind then
+					Window:SetOpen(not Window.IsOpen)
+				end
 			end
 		end)
 
