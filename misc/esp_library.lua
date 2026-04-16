@@ -1,18 +1,20 @@
 -- made by @nfpw skidded from unknown source and sametexe001
 
-local esp_module = {}
-
---// render utility
+-- render utility
 local utility = {}
 function utility:render(class, properties)
     local instance = Instance.new(class)
     for property, value in pairs(properties) do
-        instance[property] = value
+        if property == "Font" and type(value) == "table" and value.EnumType then
+            instance.FontFace = value
+        else
+            instance[property] = value
+        end
     end
     return instance
 end
 
---// custom font
+-- custom font
 local custom_font = { }
 do
     local http_service = cloneref(game:GetService("HttpService"))
@@ -21,7 +23,7 @@ do
         local folder = assets_folder or "Enviro_Assets"
         
         if isfile(folder .. "/" .. name .. ".json") then
-            return Font.new(getcustomasset(folder .. "/" .. name .. ".json"))
+            return Font.fromEnum(Enum.Font.Gotham)
         end
 
         if not isfile(folder .. "/" .. name .. ".ttf") then 
@@ -30,32 +32,22 @@ do
                 Url = data.url,
                 Method = "GET"
             })
-            writefile(folder .. "/" .. name .. ".ttf", response.Body)
+            if response and response.Body then
+                writefile(folder .. "/" .. name .. ".ttf", response.Body)
+            end
         end
 
-        local font_data = {
-            name = name,
-            faces = { {
-                name = "Regular",
-                weight = weight,
-                style = style,
-                assetId = getcustomasset(folder .. "/" .. name .. ".ttf")
-            } }
+        return {
+            EnumType = true,
+            Font = Font.fromEnum(Enum.Font.Gotham)
         }
-
-        writefile(folder .. "/" .. name .. ".json", http_service:JSONEncode(font_data))
-        return Font.new(getcustomasset(folder .. "/" .. name .. ".json"))
     end
 
     function custom_font:get(name, assets_folder)
-        local folder = assets_folder or "Enviro_Assets"
-        if isfile(folder .. "/" .. name .. ".json") then
-            return Font.new(getcustomasset(folder .. "/" .. name .. ".json"))
-        end
+        return Font.fromEnum(Enum.Font.Gotham)
     end
 end
 
---// create new esp instance
 function esp_module.new(settings, parent_gui)
     local self = setmetatable({}, {__index = esp_module})
     
@@ -138,15 +130,11 @@ function esp_module.new(settings, parent_gui)
 end
 
 function esp_module:initialize_fonts(assets_folder)
-    local monaco_font = custom_font:new("Monaco", 400, "Regular", {
-        url = "https://raw.githubusercontent.com/nfpw/Enviro/main/ui_library/assets/Monaco.ttf"
-    }, assets_folder)
-    
-    self.fonts.default = monaco_font or Font.new()
-    self.fonts.username = self.settings.player_esp.username.font or self.fonts.default
-    self.fonts.health = self.fonts.default
-    self.fonts.tool = self.fonts.default
-    self.fonts.distance = self.fonts.default
+    self.fonts.default = Enum.Font.Gotham
+    self.fonts.username = Enum.Font.Gotham
+    self.fonts.health = Enum.Font.Gotham
+    self.fonts.tool = Enum.Font.Gotham
+    self.fonts.distance = Enum.Font.Gotham
 end
 
 function esp_module:initialize()
@@ -555,20 +543,6 @@ function esp_module:start()
                 
                 holder.Visible = true
                 
-                -- Update fonts if changed
-                if username_text.Font ~= self.fonts.username then
-                    username_text.Font = self.fonts.username
-                end
-                if health_value.Font ~= self.fonts.health then
-                    health_value.Font = self.fonts.health
-                end
-                if tool_text.Font ~= self.fonts.tool then
-                    tool_text.Font = self.fonts.tool
-                end
-                if distance_text.Font ~= self.fonts.distance then
-                    distance_text.Font = self.fonts.distance
-                end
-                
                 -- Box rendering
                 if esp_table.box.enabled then
                     local inline_color = team_color or esp_table.box.colors.inline or default_color
@@ -749,12 +723,6 @@ end
 
 function esp_module:update_settings(new_settings)
     self.settings = new_settings
-    if new_settings.player_esp.username.font then
-        self.fonts.username = new_settings.player_esp.username.font
-    end
-    if new_settings.player_esp.tool.font then
-        self.fonts.tool = new_settings.player_esp.tool.font
-    end
 end
 
 function esp_module:toggle(toggle)
