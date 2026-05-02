@@ -17,7 +17,7 @@ local function target()
 			local humanoid = char:FindFirstChild("Humanoid")
 			if hrp and humanoid then
 				local health = humanoid.Health
-				if health == health and health ~= math.huge and health > 0 then
+				if health == health and health ~= math.huge and health > 0 and not char:FindFirstChildOfClass("ForceField") then
 					local distance = (h.Position - hrp.Position).Magnitude
 					if distance < sd then
 						sd = distance
