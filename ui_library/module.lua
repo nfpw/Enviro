@@ -7747,7 +7747,7 @@ local Library do
 					end
 				end)
 				MakeCardBtn("Teleport", 27, Library.Theme.Accent, function()
-					local TeleportService = cloneref(game:GetService("TeleportService"))
+					local TeleportService = cloneref(game.GetService(game, "TeleportService")) or cloneref(game:GetService("TeleportService"))
 					Library:SafeCall(function()
 						TeleportService:Teleport(Game.PlaceId, Players.LocalPlayer)
 					end)
