@@ -6740,7 +6740,7 @@ local Library do
 
 	Library.KeySystem = function(self, Data)
 		Data = Data or {}
-
+		
 		local Key = Data.Key or Data.key or ""
 		local Title = Data.Title or Data.title or "Key System"
 		local Description = Data.Description or Data.description or "Enter your key to continue"
@@ -6759,6 +6759,7 @@ local Library do
 
 		local Passed = false
 		local SaveToggled = SaveKey
+		local EnteredKeyValue = ""
 
 		local Gui = Instances:Create("ScreenGui", {
 			Parent = gethui(),
@@ -6769,65 +6770,6 @@ local Library do
 		})
 
 		Library._KeySystemGui = Gui
-
-		Library:Thread(function()
-			while Gui.Instance and Gui.Instance.Parent do
-				for i = 1, 3 do
-					local Size = math.random(2, 6)
-					local Particle = Instances:Create("Frame", {
-						Parent = Gui.Instance,
-						Name = "\0",
-						Size = UDim2New(0, Size, 0, Size),
-						Position = UDim2New(math.random(0, 100) / 100, 0, 1.05, 0),
-						BackgroundColor3 = i == 1 and Library.Theme.Accent or i == 2 and Library.Theme["Page Background"] or Library.Theme.Outline,
-						BackgroundTransparency = math.random(20, 60) / 100,
-						BorderSizePixel = 0,
-						ZIndex = 1,
-					})
-					Instances:Create("UICorner", {Parent = Particle.Instance, CornerRadius = UDimNew(1, 0)})
-
-					local Duration = math.random(25, 60) / 10
-					local DriftX = math.random(-15, 15) / 100
-					TweenService:Create(Particle.Instance, TweenInfo.new(Duration, Enum.EasingStyle.Linear), {
-						Position = UDim2New(Particle.Instance.Position.X.Scale + DriftX, 0, -0.1, 0),
-						BackgroundTransparency = 1,
-						Size = UDim2New(0, math.random(1, 3), 0, math.random(1, 3)),
-					}):Play()
-
-					task.delay(Duration, function()
-						if Particle and Particle.Instance then Particle:Clean() end
-					end)
-				end
-				task.wait(math.random(1, 3) / 10)
-			end
-		end)
-
-		Library:Thread(function()
-			while Gui.Instance and Gui.Instance.Parent do
-				local Spark = Instances:Create("Frame", {
-					Parent = Gui.Instance,
-					Name = "\0",
-					Size = UDim2New(0, 2, 0, 2),
-					Position = UDim2New(math.random(5, 95) / 100, 0, math.random(20, 80) / 100, 0),
-					BackgroundColor3 = Library.Theme.Accent,
-					BackgroundTransparency = 0.3,
-					BorderSizePixel = 0,
-					ZIndex = 1,
-				})
-				Instances:Create("UICorner", {Parent = Spark.Instance, CornerRadius = UDimNew(1, 0)})
-
-				local Duration = math.random(8, 20) / 10
-				TweenService:Create(Spark.Instance, TweenInfo.new(Duration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-					BackgroundTransparency = 1,
-					Size = UDim2New(0, 0, 0, 0),
-				}):Play()
-
-				task.delay(Duration, function()
-					if Spark and Spark.Instance then Spark:Clean() end
-				end)
-				task.wait(math.random(5, 15) / 100)
-			end
-		end)
 
 		local Window = Instances:Create("Frame", {
 			Parent = Gui.Instance,
@@ -6843,50 +6785,9 @@ local Library do
 		})  Window:AddToTheme({BackgroundColor3 = "Background", BorderColor3 = "Border"})
 		Window:Border("Outline")
 
-		local Dragging = false
-		local DragStart
-		local StartPos
-
-		Window:Connect("InputBegan", function(Input)
-			if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-				Dragging = true
-				DragStart = Input.Position
-				StartPos = Window.Instance.Position
-				Input.Changed:Connect(function()
-					if Input.UserInputState == Enum.UserInputState.End then
-						Dragging = false
-					end
-				end)
-			end
-		end)
-
-		Library:Connect(UserInputService.InputChanged, function(Input)
-			if Dragging and (Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch) then
-				local Delta = Input.Position - DragStart
-				TweenService:Create(Window.Instance, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-					Position = UDim2New(StartPos.X.Scale, StartPos.X.Offset + Delta.X, StartPos.Y.Scale, StartPos.Y.Offset + Delta.Y)
-				}):Play()
-			end
-		end)
-
 		TweenService:Create(Window.Instance, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
 			Size = UDim2New(0, 280, 0, 156)
 		}):Play()
-
-		local Liner = Instances:Create("Frame", {
-			Parent = Window.Instance,
-			Name = "\0",
-			Size = UDim2New(0, 0, 0, 1),
-			BackgroundColor3 = Library.Theme.Accent,
-			BorderSizePixel = 0,
-			ZIndex = 3,
-		})  Liner:AddToTheme({BackgroundColor3 = "Accent"})
-
-		task.delay(0.3, function()
-			TweenService:Create(Liner.Instance, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-				Size = UDim2New(1, 0, 0, 1)
-			}):Play()
-		end)
 
 		local TitleLabel = Instances:Create("TextLabel", {
 			Parent = Window.Instance,
@@ -6980,78 +6881,6 @@ local Library do
 		})
 		StatusLabel:TextBorder()
 
-		local SaveIndicator = Instances:Create("Frame", {
-			Parent = Window.Instance,
-			Name = "\0",
-			AnchorPoint = Vector2New(1, 0),
-			Position = UDim2New(1, -8, 0, 79),
-			Size = UDim2New(0, 12, 0, 12),
-			BackgroundColor3 = SaveToggled and Library.Theme.Accent or Library.Theme.Element,
-			BorderColor3 = FromRGB(12, 12, 12),
-			BorderSizePixel = 2,
-			ZIndex = 3,
-		})  SaveIndicator:AddToTheme({BorderColor3 = "Border"})
-		SaveIndicator:Border("Outline")
-
-		local SaveCheck = Instances:Create("ImageLabel", {
-			Parent = SaveIndicator.Instance,
-			Name = "\0",
-			ImageColor3 = FromRGB(0, 0, 0),
-			ScaleType = Enum.ScaleType.Fit,
-			ImageTransparency = SaveToggled and 0 or 1,
-			BorderColor3 = FromRGB(0, 0, 0),
-			AnchorPoint = Vector2New(0.5, 0.5),
-			Image = Library:GetImage("Check"),
-			BackgroundTransparency = 1,
-			Position = UDim2New(0.5, 0, 0.5, 0),
-			Size = SaveToggled and UDim2New(1, 2, 1, 2) or UDim2New(0, 0, 0, 0),
-			BorderSizePixel = 0,
-			BackgroundColor3 = FromRGB(255, 255, 255),
-			ZIndex = 4,
-		})
-
-		local SaveLabel = Instances:Create("TextLabel", {
-			Parent = Window.Instance,
-			Name = "\0",
-			FontFace = Library.Font,
-			Text = "Save key",
-			TextColor3 = Library.Theme.Text,
-			TextSize = 9,
-			BackgroundTransparency = 1,
-			AnchorPoint = Vector2New(1, 0),
-			Position = UDim2New(1, -24, 0, 80),
-			Size = UDim2New(0, 0, 0, 9),
-			AutomaticSize = Enum.AutomaticSize.X,
-			TextXAlignment = Enum.TextXAlignment.Right,
-			BorderSizePixel = 0,
-			ZIndex = 3,
-		})  SaveLabel:AddToTheme({TextColor3 = "Text"})
-		SaveLabel:TextBorder()
-
-		local SaveButton = Instances:Create("TextButton", {
-			Parent = Window.Instance,
-			Name = "\0",
-			Text = "",
-			AutoButtonColor = false,
-			AnchorPoint = Vector2New(1, 0),
-			Position = UDim2New(1, -8, 0, 77),
-			Size = UDim2New(0, 70, 0, 16),
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			ZIndex = 4,
-		})
-
-		SaveButton:Connect("MouseButton1Down", function()
-			SaveToggled = not SaveToggled
-			TweenService:Create(SaveIndicator.Instance, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
-				BackgroundColor3 = SaveToggled and Library.Theme.Accent or Library.Theme.Element
-			}):Play()
-			TweenService:Create(SaveCheck.Instance, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-				ImageTransparency = SaveToggled and 0 or 1,
-				Size = SaveToggled and UDim2New(1, 2, 1, 2) or UDim2New(0, 0, 0, 0)
-			}):Play()
-		end)
-
 		local function MakeButton(Text, Position, Size, Callback)
 			local Btn = Instances:Create("TextButton", {
 				Parent = Window.Instance,
@@ -7104,37 +6933,15 @@ local Library do
 
 		MakeButton("Confirm", UDim2New(0, 8, 0, 100), UDim2New(1, -16, 0, 20), function()
 			local Entered = Input.Instance.Text
-			if Entered == Key then
+			EnteredKeyValue = Entered
+			
+			if Entered == Key or Key == "" then
 				StatusLabel.Instance.TextColor3 = FromRGB(134, 235, 56)
 				StatusLabel.Instance.Text = "Key accepted!"
 
-				for i = 1, 12 do
-					local Burst = Instances:Create("Frame", {
-						Parent = Window.Instance,
-						Name = "\0",
-						Size = UDim2New(0, math.random(3, 6), 0, math.random(3, 6)),
-						AnchorPoint = Vector2New(0.5, 0.5),
-						Position = UDim2New(0.5, 0, 0.5, 0),
-						BackgroundColor3 = i <= 6 and Library.Theme.Accent or Library.Theme["Page Background"],
-						BorderSizePixel = 0,
-						ZIndex = 5,
-					})
-					Instances:Create("UICorner", {Parent = Burst.Instance, CornerRadius = UDimNew(1, 0)})
-
-					local Angle = (i / 12) * math.pi * 2
-					local Dist = math.random(50, 100)
-					TweenService:Create(Burst.Instance, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-						Position = UDim2New(0.5, math.cos(Angle) * Dist, 0.5, math.sin(Angle) * Dist),
-						BackgroundTransparency = 1,
-						Size = UDim2New(0, 0, 0, 0),
-					}):Play()
-
-					task.delay(0.6, function()
-						if Burst and Burst.Instance then Burst:Clean() end
-					end)
+				if SaveToggled then 
+					writefile(KeyFile, Entered)
 				end
-
-				if SaveToggled then writefile(KeyFile, Key) end
 
 				task.wait(0.9)
 
@@ -7151,7 +6958,9 @@ local Library do
 				Gui:Clean()
 				Passed = true
 
-				if Data.Callback then Library:SafeCall(Data.Callback, true) end
+				if Data.Callback then 
+					Library:SafeCall(Data.Callback, true, EnteredKeyValue) 
+				end
 			else
 				StatusLabel.Instance.TextColor3 = FromRGB(235, 76, 48)
 				StatusLabel.Instance.Text = "Invalid key."
