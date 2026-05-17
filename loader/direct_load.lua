@@ -1,6 +1,5 @@
-getgenv().Enviro = getgenv().Enviro or {debug = false, safe_load = false, direct_load = false}
-local request = (syn and syn.request) or (http and http.request) or http_request
-local queueteleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
+getgenv().Enviro = getgenv().Enviro or {debug = false, safe_load = false, direct_load = false, key = "none"}
+local request = (syn and syn.request) or (http and http.request) or http_request or request
 local loader = {}
 local req = nil
 
@@ -11,27 +10,27 @@ loader["request_url"] = function(url)
 end
 
 loader["check_script"] = function(url)
-	local body, statuscode = loader["request_url"](url)
+	local body, status_code = loader["request_url"](url)
 	if body then
-		return true, body; else return false, statuscode
+		return true, body; else return false, status_code
 	end
 end
 
 loader["load_script"] = function(url, content)
-	local scriptcontent = content; if not scriptcontent then
-		local body, statuscode = loader["request_url"](url)
+	local script_content = content; if not script_content then
+		local body, status_code = loader["request_url"](url)
 		if not body then return end
-		scriptcontent = body
-	end; local success, result = pcall(function() return loadstring(scriptcontent)() end)
+		script_content = body
+	end; local success, result = pcall(function() return loadstring(script_content)() end)
 end
 
 loader["init"] = function()
-	local githuburl = "https://raw.githubusercontent.com/nfpw/Enviro/refs/heads/main/games/"
-	local gameid = githuburl .. tonumber(game.GameId) .. ".lua"
-	local universal = githuburl .. "universal.lua"
-	local gamescriptexist, gamecontent = loader["check_script"](gameid)
-	if gamescriptexist then
-		loader["load_script"](gameid, gamecontent) else loader["load_script"](universal, nil)
+	local github_url = "https://raw.githubusercontent.com/nfpw/Enviro/refs/heads/main/games/"
+	local game_id = github_url .. tonumber(game.GameId) .. ".lua"
+	local universal = github_url .. "universal.lua"
+	local game_script_exist, game_content = loader["check_script"](game_id)
+	if game_script_exist then
+		loader["load_script"](game_id, game_content) else loader["load_script"](universal, nil)
 	end
 end
 
