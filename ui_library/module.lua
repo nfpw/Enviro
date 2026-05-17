@@ -7105,42 +7105,20 @@ local Library do
 
 		MakeButton("Confirm", UDim2New(0, 8, 0, 100), UDim2New(1, -16, 0, 20), function()
 			local Entered = Input.Instance.Text
-			EnteredKeyValue = Entered -- Store entered key
+			EnteredKeyValue = Entered
 
-			if Entered == Key then
+			local isValid = (Entered == Key) or (Key == "" and Entered ~= "") -- fix
+			
+			if isValid then
 				StatusLabel.Instance.TextColor3 = FromRGB(134, 235, 56)
 				StatusLabel.Instance.Text = "Key accepted!"
-
-				for i = 1, 12 do
-					local Burst = Instances:Create("Frame", {
-						Parent = Window.Instance,
-						Name = "\0",
-						Size = UDim2New(0, math.random(3, 6), 0, math.random(3, 6)),
-						AnchorPoint = Vector2New(0.5, 0.5),
-						Position = UDim2New(0.5, 0, 0.5, 0),
-						BackgroundColor3 = i <= 6 and Library.Theme.Accent or Library.Theme["Page Background"],
-						BorderSizePixel = 0,
-						ZIndex = 5,
-					})
-					Instances:Create("UICorner", {Parent = Burst.Instance, CornerRadius = UDimNew(1, 0)})
-
-					local Angle = (i / 12) * math.pi * 2
-					local Dist = math.random(50, 100)
-					TweenService:Create(Burst.Instance, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-						Position = UDim2New(0.5, math.cos(Angle) * Dist, 0.5, math.sin(Angle) * Dist),
-						BackgroundTransparency = 1,
-						Size = UDim2New(0, 0, 0, 0),
-					}):Play()
-
-					task.delay(0.6, function()
-						if Burst and Burst.Instance then Burst:Clean() end
-					end)
+ 
+				if SaveToggled then 
+					writefile(KeyFile, Entered)
 				end
-
-				if SaveToggled then writefile(KeyFile, Key) end
-
+ 
 				task.wait(0.9)
-
+ 
 				local CloseCompleted = false
 				local CloseTween = TweenService:Create(Window.Instance, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
 					Size = UDim2New(0, 0, 0, 0)
@@ -7149,12 +7127,14 @@ local Library do
 					CloseCompleted = true
 				end)
 				CloseTween:Play()
-
+ 
 				repeat task.wait() until CloseCompleted
 				Gui:Clean()
 				Passed = true
-
-				if Data.Callback then Library:SafeCall(Data.Callback, true, EnteredKeyValue) end
+ 
+				if Data.Callback then 
+					Library:SafeCall(Data.Callback, true, EnteredKeyValue) 
+				end
 			else
 				StatusLabel.Instance.TextColor3 = FromRGB(235, 76, 48)
 				StatusLabel.Instance.Text = "Invalid key."
