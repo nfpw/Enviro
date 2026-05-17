@@ -27,10 +27,13 @@ end
 loader["init"] = function()
 	local github_url = "https://raw.githubusercontent.com/nfpw/Enviro/refs/heads/main/games/"
 	local game_id = github_url .. tonumber(game.GameId) .. ".lua"
-	local universal = github_url .. "universal.lua"
+	local gui_load_url = "https://raw.githubusercontent.com/nfpw/Enviro/refs/heads/main/loader/gui_load.lua"
+	
 	local game_script_exist, game_content = loader["check_script"](game_id)
 	if game_script_exist then
-		loader["load_script"](game_id, game_content) else loader["load_script"](universal, nil)
+		loader["load_script"](game_id, game_content)
+	else
+		loader["load_script"](gui_load_url, nil)
 	end
 end
 
