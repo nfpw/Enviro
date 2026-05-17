@@ -1,7 +1,5 @@
-getgenv().Enviro = getgenv().Enviro or {debug = false, safe_load = false, direct_load = false}
-local request = (syn and syn.request) or (http and http.request) or http_request
-local queueteleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
-
+getgenv().Enviro = getgenv().Enviro or {debug = false, safe_load = false, direct_load = false, key = "none"}
+local request = (syn and syn.request) or (http and http.request) or http_request or request
 local loader = {}
 local req = nil
 
