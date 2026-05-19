@@ -3969,7 +3969,7 @@ local Library do
 
 			local KeylistItem
 
-			if Library.KeyList and not Data.HideFromList then
+			if Library.KeyList and not Data.HideFromList and Data.Default then
 				KeylistItem = Library.KeyList:Add("", "", "")
 			end
 
