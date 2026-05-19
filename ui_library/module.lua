@@ -6198,7 +6198,7 @@ local Library do
 				Section = self.Section,
 
 				Flag = Data.Flag or Data.flag or Library:NextFlag(),
-				Default = Data.Default or Data.default or Enum.KeyCode.RightShift,
+				Default = Data.Default or Data.default or nil,
 				Callback = Data.Callback or Data.callback or function() end,
 				Mode = Data.Mode or Data.mode or "Toggle",
 			}
