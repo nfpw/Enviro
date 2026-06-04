@@ -432,11 +432,15 @@ local Library do
 		end
 
 		Instances.ChangeItemTheme = function(self, Properties)
-			if not self.Instance then 
-				return
-			end
+    		if not self.Instance then 
+        		return
+    		end
 
-			Library:ChangeItemTheme(self, Properties)
+    		if not Library then
+        		return
+    		end
+
+    		Library:ChangeItemTheme(self, Properties)
 		end
 
 		Instances.Connect = function(self, Event, Callback, Name)
@@ -849,21 +853,37 @@ local Library do
 	})
 
 	Library.Unload = function(self)
-		for Index, Value in self.Connections do 
-			pcall(function() Value.Connection:Disconnect() end)
-		end
+    	for Index, Value in self.Connections do 
+        	pcall(function() Value.Connection:Disconnect() end)
+    	end
+    	self.Connections = {}
 
-		for Index, Value in self.Threads do 
-			pcall(function() coroutine.close(Value) end)
-		end
+    	for Index, Value in self.Threads do 
+        	pcall(function() coroutine.close(Value) end)
+    	end
 
-		if self.Holder then 
-			self.Holder:Clean()
-		end
+		if self.NotifHolder then
+        	pcall(function()
+            	for _, child in self.NotifHolder.Instance:GetChildren() do
+                	child:Destroy()
+            	end
+        	end)
+        	pcall(function() self.NotifHolder.Instance:Destroy() end)
+        	self.NotifHolder = nil
+    	end
 
-		if self.UnusedHolder then
-			self.UnusedHolder:Clean()
-		end
+    	if self.NotifHolder then
+        	pcall(function() self.NotifHolder.Instance:Destroy() end)
+        	self.NotifHolder = nil
+    	end
+
+    	if self.Holder then 
+       		self.Holder:Clean()
+    	end
+
+    	if self.UnusedHolder then
+        	self.UnusedHolder:Clean()
+    	end
 
 		if self._KeySystemGui then
 			pcall(function() self._KeySystemGui:Clean() end)
