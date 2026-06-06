@@ -285,6 +285,10 @@ local Library do
 		Tween.__index = Tween
 
 		Tween.Create = function(self, Item, Info, Goal, IsRawItem)
+			if not Library then
+				return
+			end
+
 			Item = IsRawItem and Item or Item.Instance
 			Info = Info or TweenInfo.new(Library.Tween.Time, Library.Tween.Style, Library.Tween.Direction)
 
@@ -457,6 +461,10 @@ local Library do
 
 		Instances.Tween = function(self, Info, Goal)
 			if not self.Instance then 
+				return
+			end
+
+			if not Library then
 				return
 			end
 
@@ -1975,6 +1983,7 @@ local Library do
 				end
 
 				function NewButton:Press()
+					if not Library then return end
 					SubItems["NewButton"]:ChangeItemTheme({BackgroundColor3 = "Accent", BorderColor3 = "Border"})
 					SubItems["NewButton"]:Tween(nil, {BackgroundColor3 = Library.Theme.Accent})
 
