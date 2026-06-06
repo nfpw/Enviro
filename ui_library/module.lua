@@ -6616,8 +6616,10 @@ local Library do
 				end
 			end
 
-			local ConfigsSubPage = SettingsPage:SubPage({Name = "Configs", Columns = 2}) do 
-				local ConfigsSection = ConfigsSubPage:Section({Name = "Configs", Side = 1}) do
+			local SettingsSubPage = SettingsPage:SubPage({Name = "Settings", Columns = 2}) do 
+				local SettingsSection = SettingsSubPage:Section({Name = "Menu Settings", Side = 1}) do
+
+				local ConfigsSection = SettingsSubPage:Section({Name = "Configs", Side = 2}) do
 					local ConfigName
 					local ConfigSelected
 
@@ -6688,10 +6690,7 @@ local Library do
 
 					Library:RefreshConfigsList(ConfigsSearchbox)
 				end
-			end
 
-			local SettingsSubPage = SettingsPage:SubPage({Name = "Settings", Columns = 2}) do 
-				local SettingsSection = SettingsSubPage:Section({Name = "Settings", Side = 1}) do
 					SettingsSection:Toggle({
 						Name = "Watermark",
 						Flag = "Watermark",
