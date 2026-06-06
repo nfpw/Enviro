@@ -2306,6 +2306,10 @@ local Library do
 					BackgroundColor3 = FromRGB(255, 255, 255)
 				})
 
+				Items["Text"].Instance:GetPropertyChangedSignal("TextBounds"):Connect(function()
+					Items["SubElements"].Instance.Position = UDim2New(0, Items["Text"].Instance.TextBounds.X + 8, 0, 0)
+				end)
+
 				Instances:Create("UIListLayout", {
 					Parent = Items["SubElements"].Instance,
 					Name = "\0",
@@ -6757,7 +6761,7 @@ local Library do
 						Library:Unload()
 					end)
 
-					SettingsSection:Label("UI Keybind"):Keybind({
+					SettingsSection:Label("Menu keybind"):Keybind({
 						Name = "Menu keybind",
 						Flag = "UIKeybind",
 						Default = Library.MenuKeybind,
