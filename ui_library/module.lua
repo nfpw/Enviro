@@ -1845,11 +1845,13 @@ local Library do
 					Items["Indicator"]:ChangeItemTheme({BackgroundColor3 = "Accent", BorderColor3 = "Border"})
 					Items["Indicator"]:Tween(nil, {BackgroundColor3 = Library.Theme.Accent})
 					task.wait(0.05)
+					if not Library then return end
 					Items["Check"]:Tween(TweenInfo.new(Library.Tween.Time, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {ImageTransparency = 0, Size = UDim2New(1, 2, 1, 2)})
 				else
 					Items["Indicator"]:ChangeItemTheme({BackgroundColor3 = "Element", BorderColor3 = "Border"})
 					Items["Indicator"]:Tween(nil, {BackgroundColor3 = Library.Theme.Element})
 					task.wait(0.05)
+					if not Library then return end
 					Items["Check"]:Tween(TweenInfo.new(Library.Tween.Time, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {ImageTransparency = 1, Size = UDim2New(0, 0, 0, 0)})
 				end
 
@@ -1983,15 +1985,17 @@ local Library do
 				end
 
 				function NewButton:Press()
-					if not Library then return end
-					SubItems["NewButton"]:ChangeItemTheme({BackgroundColor3 = "Accent", BorderColor3 = "Border"})
-					SubItems["NewButton"]:Tween(nil, {BackgroundColor3 = Library.Theme.Accent})
+					local Btn = SubItems["NewButton"]
+					if not Library or not Btn or not Btn.Instance or not Btn.Instance.Parent then return end
+					Btn:ChangeItemTheme({BackgroundColor3 = "Accent", BorderColor3 = "Border"})
+					Btn:Tween(nil, {BackgroundColor3 = Library.Theme.Accent})
 
 					Library:SafeCall(Callback)
 					task.wait(0.1)
+					if not Library or not Btn or not Btn.Instance or not Btn.Instance.Parent then return end
 					--Library:PlaySound("Click", 0.4, 1.05)
-					SubItems["NewButton"]:ChangeItemTheme({BackgroundColor3 = "Element", BorderColor3 = "Border"})
-					SubItems["NewButton"]:Tween(nil, {BackgroundColor3 = Library.Theme.Element})
+					Btn:ChangeItemTheme({BackgroundColor3 = "Element", BorderColor3 = "Border"})
+					Btn:Tween(nil, {BackgroundColor3 = Library.Theme.Element})
 				end
 
 				function NewButton:SetVisibility(Bool)
@@ -2554,6 +2558,7 @@ local Library do
 					Debounce = false
 					Items["OptionHolder"].Instance.Visible = Dropdown.IsOpen
 					task.wait(0.2)
+					if not Library then return end
 					Items["OptionHolder"].Instance.Parent = not Dropdown.IsOpen and Library.UnusedHolder.Instance or Library.Holder.Instance
 				end
 				--Library:PlaySound("Click", 0.3, Bool and 1.1 or 0.85)
@@ -3723,6 +3728,7 @@ local Library do
 					Debounce = false
 					Items["ColorpickerWindow"].Instance.Visible = Colorpicker.IsOpen
 					task.wait(0.2)
+					if not Library then return end
 					Items["ColorpickerWindow"].Instance.Parent = not Colorpicker.IsOpen and Library.UnusedHolder.Instance or Library.Holder.Instance
 				end
 				--Library:PlaySound("Click", 0.25, Bool and 1.1 or 0.85)
@@ -4267,6 +4273,7 @@ local Library do
 					Debounce = false
 					Items["KeybindWindow"].Instance.Visible = Keybind.IsOpen
 					task.wait(0.2)
+					if not Library then return end
 					Items["KeybindWindow"].Instance.Parent = not Keybind.IsOpen and Library.UnusedHolder.Instance or Library.Holder.Instance
 				end
 				--Library:PlaySound("Click", 0.3, Bool and 1.1 or 0.85)
