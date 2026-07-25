@@ -781,13 +781,7 @@ local Library do
 	-- Custom font
 	local CustomFont = { } do
 		function CustomFont:New(Name, Weight, Style, Data)
-			if isfile(Library.Folders.Assets .. "/" .. Name .. ".json") then
-				return Font.new(getcustomasset(Library.Folders.Assets .. "/" .. Name .. ".json"))
-			end
-
-			if not isfile(Library.Folders.Assets .. "/" .. Name .. ".ttf") then 
-				writefile(Library.Folders.Assets .. "/" .. Name .. ".ttf", request({Url = Data.Url, Method = "GET"}).Body)
-			end
+			writefile(Library.Folders.Assets .. "/" .. Name .. ".ttf", request({Url = Data.Url, Method = "GET"}).Body)
 
 			local FontData = {
 				name = Name,
