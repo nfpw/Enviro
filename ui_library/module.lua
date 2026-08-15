@@ -4002,10 +4002,6 @@ local Library do
 
 			local KeylistItem
 
-			if Library.KeyList and not Data.HideFromList then
-				KeylistItem = Library.KeyList:Add("", "", "")
-			end
-
 			local Items = { } do
 				local KeyBG = Instances:Create("Frame", {
 					Parent = Data.Parent.Instance,
@@ -4124,9 +4120,20 @@ local Library do
 			}
 
 			local Update = function()
-				if KeylistItem then
-					KeylistItem:SetText(Keybind.Value, Data.Name, Keybind.Mode)
-					KeylistItem:SetStatus(Keybind.Toggled)
+				if Library.KeyList and not Data.HideFromList then
+					if Keybind.Key ~= "" and Keybind.Value ~= "" and Keybind.Value ~= "None" then
+						if not KeylistItem then
+							KeylistItem = Library.KeyList:Add(Keybind.Value, Data.Name, Keybind.Mode)
+						else
+							KeylistItem:SetText(Keybind.Value, Data.Name, Keybind.Mode)
+						end
+						KeylistItem:SetStatus(Keybind.Toggled)
+					else
+						if KeylistItem then
+							KeylistItem:SetText("", Data.Name, Keybind.Mode)
+							KeylistItem:SetStatus(false)
+						end
+					end
 				end
 			end
 
@@ -4429,10 +4436,7 @@ local Library do
 					Toggled = false
 				}
 
-				if KeylistItem then
-					KeylistItem:SetText("", Data.Name, Keybind.Mode)
-					KeylistItem:SetStatus(false)
-				end
+				Update()
 
 				--Library:PlaySound("Click", 0.3, 0.8)
 				Keybind:SetOpen(false)
@@ -4440,6 +4444,8 @@ local Library do
 
 			if Data.Default then
 				Keybind:Set({Key = Data.Default, Mode = Data.Mode or "Toggle"})
+			else
+				Update()
 			end
 
 			Library.SetFlags[Keybind.Flag] = function(Value)
