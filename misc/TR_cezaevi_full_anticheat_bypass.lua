@@ -14,7 +14,7 @@ for _, obj in pairs(filtergc("function", {}, false)) do
                     print("[@nfpw bypass] blocked report")
                 elseif cons[8] == "VoiceChat3" and cons[9] == "FireServer" then
                     hookfunction(obj, function() return true end)
-                    print("[@nfpw bypass] blocked insane ban remote")
+                    print("[@nfpw bypass] blocked ban")
                 end
 
                 if uv and ups and type(ups[1]) == "function" and not hooked[ups[1]] then
@@ -54,7 +54,7 @@ if lp.Character then
 end
 
 lp.CharacterAdded:Connect(function(char)
-    print("[@nfpw bypass] character added, waiting for hrp part of character")
+    --print("[@nfpw bypass] character added, waiting for hrp")
     sigma_function(char)
 
     char.ChildAdded:Connect(function(c)
