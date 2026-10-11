@@ -1,4 +1,5 @@
 -- made by @nfpw
+local hooked = {}
 for _, obj in pairs(filtergc("function", {}, false)) do
     if islclosure(obj) then
         local info = debug.getinfo(obj)
@@ -8,16 +9,19 @@ for _, obj in pairs(filtergc("function", {}, false)) do
             if not c or not cons then continue end
 
             if info.source:match("Cloudash%.Client$") then
-                if cons[1] == "Instance" and cons[2] == "new" then
-                    hookfunction(obj, function() return true end)
-                    print("[@nfpw bypass] blocked crash")
-                elseif cons[1] == "pcall" and uv and ups and type(ups[3]) == "userdata" and ups[3].Name == "VoiceChat3" then
+                if cons[1] == "pcall" and uv and ups and type(ups[3]) == "userdata" and ups[3].Name == "VoiceChat3" then
                     hookfunction(obj, function() return true end)
                     print("[@nfpw bypass] blocked report")
                 elseif cons[8] == "VoiceChat3" and cons[9] == "FireServer" then
                     hookfunction(obj, function() return true end)
                     print("[@nfpw bypass] blocked ban")
                 end
+
+				if uv and ups and type(ups[1]) == "function" and not hooked[ups[1]] then
+    				hooked[ups[1]] = true
+    				hookfunction(ups[1], function() return true end)
+    				print("[@nfpw bypass] blocked crash (upvalue 1)")
+				end
             end
 
             if info.source:match("LocalScript$") then
